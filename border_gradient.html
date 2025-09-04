@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Spotlight Border Effect</title>
+  <style>
+    :root {
+  /* Effect controls */
+  --spot-hsl: 190 90% 60%;    /* cyan-ish */
+  --spot-alpha: 0.7;          /* brightness */
+  --spot-fade: 18vmin;        /* radius */
+  --bw: 3px;                  /* border width */
+  --mx: -9999;                /* mouse x */
+  --my: -9999;                /* mouse y */
+
+  /* Theme */
+  --bg:    hsl(220 15% 7%);
+  --panel: hsl(220 15% 10%);
+  --text:  hsl(210 15% 92%);
+  --muted: hsl(220 10% 65% / 0.85);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 2rem;
+}
+
+h2 {
+  margin-bottom: 0.5rem;
+}
+
+p.lead {
+  color: var(--muted);
+  margin-bottom: 2rem;
+}
+
+.grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding: 0;
+  margin: 0;
+}
+
+.card {
+  position: relative;
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+.card h3 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+}
+.card p {
+  margin: 0;
+  color: var(--muted);
+}
+.num {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  font-weight: 800;
+  color: hsl(0 0% 100% / 0.75);
+  font-size: 1.6rem;
+}
+
+.glow-border {
+  position: relative;
+}
+
+.glow-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+
+  /* spotlight gradient following mouse */
+  background: radial-gradient(
+    circle at calc(var(--mx) * 1px) calc(var(--my) * 1px),
+    hsl(var(--spot-hsl) / var(--spot-alpha)) 0%,
+    transparent var(--spot-fade)
+  );
+  background-attachment: fixed;
+
+  /* mask trick to turn glow into border ring */
+  padding: var(--bw);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="section">
+      <h2>Feature Grid</h2>
+      <p class="lead">
+        Nine cards, 3 per row. Only the borders react to the spotlight radius.
+      </p>
+      <ul class="grid" role="list">
+        <li class="card glow-border">
+          <h3>Analytics</h3>
+          <p>Track interactions with zero JS libs.</p>
+          <span class="num">1</span>
+        </li>
+        <li class="card glow-border">
+          <h3>Performance</h3>
+          <p>Single RAF + CSS vars.</p>
+          <span class="num">2</span>
+        </li>
+        <li class="card glow-border">
+          <h3>Design</h3>
+          <p>Rounded corners supported.</p>
+          <span class="num">3</span>
+        </li>
+        <li class="card glow-border">
+          <h3>Theming</h3>
+          <p>Change hue, radius, width.</p>
+          <span class="num">4</span>
+        </li>
+        <li class="card glow-border">
+          <h3>Accessibility</h3>
+          <p>Respects reduced motion.</p>
+          <span class="num">5</span>
+        </li>
+        <li class="card glow-border">
+          <h3>Portable</h3>
+          <p>Drop into any layout.</p>
+          <span class="num">6</span>
+        </li>
+        <li class="card glow-border">
+          <h3>Scalable</h3>
+          <p>Works with many cards.</p>
+          <span class="num">7</span>
+        </li>
+        <li class="card glow-border">
+          <h3>Lightweight</h3>
+          <p>Zero heavy dependencies.</p>
+          <span class="num">8</span>
+        </li>
+        <li class="card glow-border">
+          <h3>Customizable</h3>
+          <p>Easy to configure.</p>
+          <span class="num">9</span>
+        </li>
+      </ul>
+    </section>
+  </main>
+  <script>
+    let mouseX = -9999;
+let mouseY = -9999;
+let targetX = -9999;
+let targetY = -9999;
+const speed = 0.1; // lower = slower trail
+
+document.addEventListener("mousemove", (e) => {
+  targetX = e.clientX;
+  targetY = e.clientY;
+});
+
+// smooth animation with requestAnimationFrame
+function animate() {
+  mouseX += (targetX - mouseX) * speed;
+  mouseY += (targetY - mouseY) * speed;
+
+  document.documentElement.style.setProperty("--mx", mouseX.toFixed(2));
+  document.documentElement.style.setProperty("--my", mouseY.toFixed(2));
+
+  requestAnimationFrame(animate);
+}
+animate();
+  </script>
+</body>
+</html>
